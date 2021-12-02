@@ -4,7 +4,7 @@
     pageEncoding="UTF-8"%>
 <%
 	//get방식으로 전송된 폼값을 날짜형식을 통해 타임스탬프로 변경한다.
-	SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd");
+	SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	long add_date = s.parse(request.getParameter("add_date")).getTime();
 	System.out.println("add_date= " +add_date);
 	//숫자형식으로 전송된 값을 정수로 변경한다.
@@ -14,6 +14,10 @@
 	
 	/*
 		add계열의 메서드를 통해 응답헤더를 추가한다.
+		addDateHeader(문자열, long형의타임스탬프)
+			: 응답헤더 중 날짜를 추가하는 메소드로, 세계표준시를 사용해서 설정한다.
+			대한민국은 표준시 +09, 즉 9시간이 느리므로 09시로 설정해야 정상적인
+			날짜가 출력된다.
 	*/
 	response.addDateHeader("myBirthday", add_date); //날짜형식의 응답헤더를 추가
 	response.addIntHeader("myNumber", add_int); //정수형식: 8282
@@ -23,6 +27,26 @@
 		set계열의 메서드는 기존의 응답헤더 값을 수정한다.
 	*/
 	response.setHeader("myName", "안중근"); //앞에서 설정한 값을 안중근으로 수정한다.
+
+	
+	/*
+	파일 다운로드 구현 시 사용하는 설정
+		: 웹브라우저가 인식하지 못하는 MIME타입으로 설정하면 웹브라우저는
+		파일 다운로드 창을 통해 파일을 다운로드시켜버린다.
+		jpg와 같은 이미지 파일은 웹브라우저가 인식하는 MIME타입이므로 다운로드를
+		위해서는 아래와 같은 설정이 필요하다.
+	*/
+	//response.setContentType("binary/octect-stream");
+
+	/*
+		새로운 내용을 DB에 추가했는데도 변경된 내용이 웹브라우저에 출력되지
+		않을 때 캐시를 사용하지 않겠다는 의미의 응답헤더 설정이다.
+		사이트에 접속할 때마다 F5를 누른 것처럼 새로운 정보를 서버로부터
+		받아 갱신하게 된다.
+	*/
+	response.setHeader("Pragma", "no-cache");
+	response.setHeader("cache-control", "no-cache");
+	
 %>
 <!DOCTYPE html>
 <html>
